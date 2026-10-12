@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { notFound, useParams } from "next/navigation";
 import { businesses } from "../../data/businesses";
 
 export default function BusinessProfile() {
-  // 1. Usamos useParams() en lugar de pasarlo por props para evitar el error de TypeScript
   const params = useParams();
   const slug = (params?.slug as string) || "";
   const business = businesses[slug];
@@ -15,6 +14,18 @@ export default function BusinessProfile() {
   }
 
   const [activeCategory, setActiveCategory] = useState("Todos");
+  const catalogTopRef = useRef<HTMLDivElement>(null);
+
+  const handleCategoryChange = (cat: string) => {
+    setActiveCategory(cat);
+    // Si el usuario ya hizo scroll hacia abajo, reacomoda suavemente al inicio del catálogo
+    if (catalogTopRef.current) {
+      const rect = catalogTopRef.current.getBoundingClientRect();
+      if (rect.top < 0) {
+        catalogTopRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  };
 
   const filteredProducts =
     activeCategory === "Todos"
@@ -30,7 +41,7 @@ export default function BusinessProfile() {
           <img 
             src={business.logoUrl} 
             alt={`Logo de ${business.name}`} 
-            className="h-28 object-contain mb-4"
+            className="h-28 object-contain mb-4 rounded-[100px] w-[150px] h-[150px] border border-[#efefef]"
           />
         ) : (
           <div 
@@ -62,7 +73,6 @@ export default function BusinessProfile() {
             Asesoría WhatsApp
           </a>
           
-          {/* Botón de ancla hacia las secciones inferiores */}
           <a
             href="#secciones-informativas"
             className="px-5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-800 font-medium py-3 rounded-xl text-sm transition-colors text-center shrink-0"
@@ -72,27 +82,31 @@ export default function BusinessProfile() {
         </div>
       </header>
 
-      <div className="max-w-lg mx-auto px-4 mt-6">
-        {/* PESTAÑAS (TABS) DINÁMICAS */}
-        <div className="sticky top-4 bg-white/90 backdrop-blur-md p-1.5 rounded-2xl shadow-sm border border-gray-100 flex overflow-x-auto gap-1 no-scrollbar mb-6 z-30">
-          {business.categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              style={activeCategory === cat ? { backgroundColor: business.theme.primary, color: 'white' } : {}}
-              className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-bold transition-all ${
-                activeCategory === cat
-                  ? "shadow-md"
-                  : "bg-transparent text-gray-500 hover:bg-gray-50"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+      {/* Punto de referencia para alinear el scroll al filtrar */}
+      <div ref={catalogTopRef} className="max-w-lg mx-auto px-4 pt-2">
+        
+        {/* PESTAÑAS (TABS) CON ESPACIADO PROTEGIDO ARRIBA Y ABAJO */}
+        <div className="sticky top-0 z-30 bg-[#f8f9fa]/95 backdrop-blur-md pt-4 pb-5 -mx-4 px-4">
+          <div className="bg-white p-1.5 rounded-2xl shadow-sm border border-gray-200/80 flex overflow-x-auto gap-1.5 no-scrollbar">
+            {business.categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => handleCategoryChange(cat)}
+                style={activeCategory === cat ? { backgroundColor: business.theme.primary, color: 'white' } : {}}
+                className={`whitespace-nowrap px-4 py-2.5 rounded-xl text-sm font-bold transition-all focus:outline-none focus:ring-0 ${
+                  activeCategory === cat
+                    ? "shadow-sm"
+                    : "bg-transparent text-gray-500 hover:bg-gray-50"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* FEED DE PRODUCTOS HOMOGÉNEO */}
-        <div className="flex flex-col gap-6 mb-12">
+        {/* FEED DE PRODUCTOS HOMOGÉNEO (Con margen superior extra) */}
+        <div className="flex flex-col gap-7 mt-2 mb-12">
           {filteredProducts.map((product) => (
             <article key={product.id} className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
               
@@ -154,7 +168,7 @@ export default function BusinessProfile() {
           ))}
         </div>
 
-        {/* SECCIONES DINÁMICAS (Club & Socios) - Usamos el ID para el ancla */}
+        {/* SECCIONES DINÁMICAS (Club & Socios) */}
         {business.infoSections && (
           <div id="secciones-informativas" className="flex flex-col gap-6 scroll-mt-24">
             {business.infoSections.map((section) => (
