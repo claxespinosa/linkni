@@ -64,14 +64,19 @@ export default function BusinessProfile() {
           <img 
             src={business.logoUrl} 
             alt={`Logo de ${business.name}`} 
-            className="h-28 object-contain mb-4"
+            className="object-contain mb-4 w-34 h-34 border border-[#ececec] rounded-full shadow-md"
           />
         ) : (
           <div 
             style={{ backgroundColor: business.theme.primary }}
-            className="w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold text-white mb-4 shadow-md"
+            className="w-34 h-34 rounded-full flex items-center justify-center text-5xl font-bold text-white mb-4 shadow-md"
           >
-            {business.name.slice(0, 2).toUpperCase()}
+            {business.name
+            .split(" ")
+            .map((word) => word[0])
+            .slice(0, 2)
+            .join("")
+            .toUpperCase()}
           </div>
         )}
 
