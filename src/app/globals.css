@@ -1,26 +1,173 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  /* ===================================================
+     1. IDENTIDAD PROPIA DE LINKNI (Plataforma / SaaS)
+     Cambia estos valores para personalizar TU marca
+     =================================================== */
+  --linkni-primary: #0f172a;     /* Color principal de Linkni (Botones del dashboard, acentos) */
+  --linkni-accent: #4f46e5;      /* Color de acento de Linkni (Badges, estados activos, links) */
+  --linkni-bg: #f8fafc;          /* Fondo general del Dashboard de Linkni */
+  --linkni-surface: #ffffff;     /* Fondo de tarjetas administrativas */
+  --linkni-border: #e2e8f0;      /* Bordes de inputs y paneles de Linkni */
 
+  /* ===================================================
+     2. VARIABLES DINÁMICAS DEL CLIENTE (Valores por defecto)
+     Se sobreescriben automáticamente en cada /[slug]
+     =================================================== */
+  --client-primary: #111827;
+  --client-secondary: #4b5563;
+  --client-bg-light: #f7f3f0;
+}
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
+/* =====================================================
+   CAPA A: ESTILOS DE TU MARCA LINKNI (Dashboard & Footer)
+   ===================================================== */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.lk-admin-page {
+  background-color: var(--linkni-bg);
+  @apply min-h-screen text-slate-800 font-sans pb-20;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.lk-admin-topbar {
+  background-color: var(--linkni-surface);
+  border-color: var(--linkni-border);
+  @apply border-b sticky top-0 z-30;
+}
+
+.lk-admin-card {
+  background-color: var(--linkni-surface);
+  border-color: var(--linkni-border);
+  @apply p-6 rounded-2xl border shadow-xs;
+}
+
+.lk-admin-btn {
+  background-color: var(--linkni-primary);
+  @apply text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-opacity hover:opacity-90 cursor-pointer disabled:opacity-50 inline-flex items-center justify-center gap-2;
+}
+
+.lk-admin-btn-secondary {
+  border-color: var(--linkni-border);
+  @apply bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold px-3.5 py-2 rounded-xl border transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5;
+}
+
+.lk-admin-tab {
+  @apply py-3 border-b-2 border-transparent text-slate-400 hover:text-slate-600 text-sm font-bold transition-colors cursor-pointer;
+}
+
+.lk-admin-tab-active {
+  border-color: var(--linkni-accent);
+  color: var(--linkni-primary);
+}
+
+.lk-admin-input {
+  border-color: var(--linkni-border);
+  @apply w-full bg-white border rounded-xl px-3.5 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-slate-400 transition-colors;
+}
+
+.lk-admin-label {
+  @apply block text-xs font-bold text-slate-600 mb-1;
+}
+
+/* Sello del ©er de Linkni (Siempre conserva la identidad de tu marca) */
+.lk-powered-footer {
+  @apply w-full py-8 text-center border-t border-gray-200/60 bg-[#f8f9fa];
+}
+
+.lk-powered-badge {
+  @apply inline-flex items-center gap-1.5 text-xs font-medium text-gray-400 hover:text-gray-600 transition-colors;
+}
+
+.lk-powered-brand {
+  color: var(--linkni-primary);
+  @apply font-black tracking-tight;
+}
+
+/* =====================================================
+   CAPA B: ESTILOS DE PLANTILLAS DE CLIENTES (.tpl-*)
+   Toman automáticamente el color de cada negocio
+   ===================================================== */
+
+.tpl-page {
+  @apply min-h-screen bg-[#f8f9fa] font-sans pb-12 text-slate-800;
+}
+
+.tpl-header {
+  @apply bg-white px-5 pt-12 pb-8 flex flex-col items-center text-center shadow-xs border-b border-gray-100;
+}
+
+.tpl-logo {
+  @apply w-32 h-32 object-contain mb-4 border border-[#ececec] rounded-full p-2 bg-white;
+}
+
+.tpl-avatar {
+  background-color: var(--client-primary);
+  @apply w-32 h-32 rounded-full flex items-center justify-center text-3xl font-black text-white mb-4 border border-[#ececec] shadow-xs select-none;
+}
+
+.tpl-tagline {
+  color: var(--client-secondary);
+  @apply text-[10px] font-bold tracking-widest uppercase mb-4;
+}
+
+.tpl-accent-text {
+  color: var(--client-secondary);
+}
+
+.tpl-icon-primary {
+  color: var(--client-primary);
+}
+
+/* Botones del Cliente */
+.tpl-btn-primary {
+  background-color: var(--client-primary);
+  @apply text-white font-bold py-3.5 px-5 rounded-xl text-sm shadow-xs transition-opacity hover:opacity-90 flex items-center justify-center gap-2 cursor-pointer;
+}
+
+.tpl-btn-outline {
+  @apply px-4 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium py-3 rounded-xl text-sm transition-colors flex items-center justify-center cursor-pointer;
+}
+
+.tpl-btn-soft {
+  @apply w-full flex items-center justify-center gap-2 bg-gray-50 hover:bg-gray-100 text-gray-800 font-semibold py-3 rounded-xl text-sm transition-colors border border-gray-200 cursor-pointer;
+}
+
+/* Barra de Categorías / Tabs del Cliente */
+.tpl-tabs-sticky {
+  @apply sticky top-0 z-30 bg-[#f8f9fa]/95 backdrop-blur-md pt-4 pb-4 -mx-4 px-4;
+}
+
+.tpl-tabs-bar {
+  @apply bg-white p-1.5 rounded-2xl shadow-xs border border-gray-200/80 flex overflow-x-auto gap-1.5;
+}
+
+.tpl-tab {
+  @apply whitespace-nowrap px-4 py-2.5 rounded-xl text-sm font-bold transition-colors focus:outline-none cursor-pointer bg-transparent text-gray-500 hover:bg-gray-50;
+}
+
+.tpl-tab-active {
+  background-color: var(--client-primary);
+  @apply text-white shadow-xs hover:opacity-95;
+}
+
+/* Tarjetas de Producto e Info del Cliente */
+.tpl-card {
+  @apply bg-white rounded-3xl shadow-xs border border-gray-100 overflow-hidden flex flex-col;
+}
+
+.tpl-card-img-box {
+  background-color: var(--client-bg-light);
+  @apply relative h-48 w-full shrink-0 flex items-center justify-center overflow-hidden;
+}
+
+.tpl-card-info {
+  @apply bg-white rounded-3xl shadow-xs border border-gray-100 p-8;
 }
