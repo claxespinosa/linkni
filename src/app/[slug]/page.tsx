@@ -17,48 +17,64 @@ export default function BusinessPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Si los params aún no han hidratado en el cliente, esperar
+    if (!slug) return;
+
+    let isMounted = true;
+
     const fetchBusiness = async () => {
-      if (!slug) return;
+      try {
+        const { data, error } = await supabase
+          .from("businesses")
+          .select("*")
+          .eq("slug", slug)
+          .maybeSingle();
 
-      const { data } = await supabase
-        .from("businesses")
-        .select("*")
-        .eq("slug", slug)
-        .single();
+        if (error) {
+          console.error("Error al consultar negocio en Supabase:", error);
+        }
 
-      if (data) {
-        setBusinessId(data.id);
-        setBusiness({
-          slug: data.slug,
-          templateType: data.template_type,
-          name: data.name,
-          tagline: data.tagline || "",
-          bio: data.bio || "",
-          whatsapp: data.whatsapp || "",
-          instagram: data.instagram || "",
-          facebook: data.facebook || "",
-          logoUrl: data.logo_url || "",
-          socialConfig: data.social_config || {}, //
-          theme: data.theme,
-          categories: data.categories || [],
-          products: data.products || [],
-          infoSections: data.info_sections || [],
-        });
+        if (data && isMounted) {
+          setBusinessId(data.id);
+          setBusiness({
+            slug: data.slug,
+            templateType: data.template_type,
+            name: data.name,
+            tagline: data.tagline || "",
+            bio: data.bio || "",
+            whatsapp: data.whatsapp || "",
+            instagram: data.instagram || "",
+            facebook: data.facebook || "",
+            logoUrl: data.logo_url || "",
+            socialConfig: data.social_config || {},
+            theme: data.theme || { primary: "#111827", secondary: "#4B5563", bgLight: "#F7F3F0" },
+            categories: data.categories || [],
+            products: data.products || [],
+            infoSections: data.info_sections || [],
+          });
 
-        // Registrar visita silenciosa en métricas de Supabase
-        await supabase.from("analytics_events").insert({
-          business_id: data.id,
-          event_type: "page_view",
-        });
+          // Registrar visita silenciosa
+          await supabase.from("analytics_events").insert({
+            business_id: data.id,
+            event_type: "page_view",
+          });
+        }
+      } catch (err) {
+        console.error("Fallo inesperado al conectar con Supabase:", err);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-
-      setLoading(false);
     };
 
     fetchBusiness();
+
+    return () => {
+      isMounted = false;
+    };
   }, [slug]);
 
-  // Función universal para registrar clics en botones desde cualquier plantilla
   const trackEvent = async (
     eventType: "whatsapp_click" | "product_click",
     itemName?: string
@@ -71,10 +87,16 @@ export default function BusinessPage() {
     });
   };
 
+  // Spinner neutro mientras resuelve la consulta en el cliente
   if (loading) {
-    return <div className="min-h-screen bg-[#f8f9fa]" />;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#f8f9fa]">
+        <div className="w-7 h-7 border-3 border-slate-200 border-t-slate-800 rounded-full animate-spin" />
+      </div>
+    );
   }
 
+  // Si terminó de cargar y no existe ese slug en la base de datos, dispara el 404
   if (!business) {
     notFound();
   }
@@ -105,10 +127,8 @@ export default function BusinessPage() {
       }
       className="relative min-h-screen flex flex-col bg-[#f8f9fa]"
     >
-      {/* Plantilla con los colores de la marca del cliente */}
       <div className="flex-1">{renderTemplate()}</div>
 
-      {/* Footer con el estilo propio de tu marca Linkni */}
       <footer className="lk-powered-footer">
         <a href="/" className="lk-powered-badge">
           <span>Impulsado por</span>
@@ -116,7 +136,6 @@ export default function BusinessPage() {
         </a>
       </footer>
 
-      {/* Botón flotante con el color del cliente */}
       <BackToTop color={business.theme.primary} />
     </div>
   );
