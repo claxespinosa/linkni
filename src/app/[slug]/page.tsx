@@ -132,7 +132,7 @@ export default function BusinessPage() {
       <footer className="lk-powered-footer">
         <a href="/" className="lk-powered-badge">
           <span>Impulsado por</span>
-          <span className="lk-powered-brand">Linkni</span>
+          <img  className="w-[40px] lk-powered-brand" src="https://mlwyhzquiamzgiywtycn.supabase.co/storage/v1/object/public/business-assets/img/linkni-logo.png"></img>© 2026
         </a>
       </footer>
 
