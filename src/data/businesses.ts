@@ -14,6 +14,8 @@ export interface Product {
   benefits: string;
   imgUrl?: string;
   price?: string;
+  options?: string;
+  customLink?: string;
 }
 
 export interface InfoSection {
@@ -24,6 +26,7 @@ export interface InfoSection {
   bullets: { bold?: string; text: string }[];
   ctaText: string;
   whatsappMessage: string;
+  customLink?: string;
 }
 
 export interface SocialConfig {
@@ -41,6 +44,13 @@ export interface SocialConfig {
   googleRating?: string;
 }
 
+export interface StoreConfig {
+  isOpen?: boolean;
+  closedMessage?: string;
+  shippingCost?: number;
+  minOrder?: number;
+}
+
 export interface BusinessProfile {
   slug: string;
   templateType: LinkniTemplateType;
@@ -52,6 +62,7 @@ export interface BusinessProfile {
   facebook?: string;
   logoUrl?: string;
   socialConfig?: SocialConfig;
+  storeConfig?: StoreConfig; // NUEVO
   theme: {
     primary: string;
     secondary: string;
