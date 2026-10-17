@@ -171,3 +171,20 @@ body {
 .tpl-card-info {
   @apply bg-white rounded-3xl shadow-xs border border-gray-100 p-8;
 }
+.c-title {
+  font-size: 35px;
+  margin-bottom: 0;
+}
+.c-description {
+  font-size: 18px;
+}
+.c-tag {
+  border-radius: 20px;
+  background: #ffffffa8;
+}
+/*.c-tag span {
+  color: #432616;
+}*/
+.btn-contact {
+  border-radius: 30px;
+}

@@ -452,7 +452,7 @@ export default function DashboardPage() {
             
             {/* 1. IDENTIDAD Y CONTACTO */}
             <section className="lk-admin-card space-y-5">
-              <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">1. IDENTIDAD Y CONTACTO</h2>
+              <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">IDENTIDAD Y CONTACTO</h2>
               
               <div className="flex items-center gap-4">
                 {business.logoUrl ? (
@@ -774,9 +774,20 @@ export default function DashboardPage() {
                             <textarea rows={2} value={prod.description} onChange={(e) => { const updated = [...business.products]; updated[idx].description = e.target.value; setBusiness({ ...business, products: updated }); }} className="lk-admin-input" />
                           </div>
 
+                          {/* CAMPO CORREGIDO PARA LAS COMAS */}
                           <div>
                             <label className="lk-admin-label">Ingredientes / Características (separados por coma)</label>
-                            <input type="text" placeholder="Ej. Café negro, Ganoderma, Ginseng..." value={(prod.keyAssets || []).join(", ")} onChange={(e) => { const updated = [...business.products]; updated[idx].keyAssets = e.target.value.split(",").map((s) => s.trim()).filter(Boolean); setBusiness({ ...business, products: updated }); }} className="lk-admin-input" />
+                            <input 
+                              type="text" 
+                              placeholder="Ej. Café negro, Ganoderma, Ginseng..." 
+                              value={Array.isArray(prod.keyAssets) ? prod.keyAssets.join(",") : (prod.keyAssets || "")} 
+                              onChange={(e) => { 
+                                const updated = [...business.products]; 
+                                updated[idx].keyAssets = e.target.value.split(","); 
+                                setBusiness({ ...business, products: updated }); 
+                              }} 
+                              className="lk-admin-input" 
+                            />
                           </div>
 
                           <div>
@@ -860,6 +871,8 @@ export default function DashboardPage() {
                             <label className="lk-admin-label">Descripción</label>
                             <textarea rows={2} value={sec.description} onChange={(e) => { const updated = [...(business.infoSections || [])]; updated[idx].description = e.target.value; setBusiness({ ...business, infoSections: updated }); }} className="lk-admin-input" />
                           </div>
+                          
+                          {/* SECCIÓN CORREGIDA A UN SOLO PAR DE CAMPOS */}
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                             <div>
                               <label className="lk-admin-label">Texto del Botón</label>
@@ -869,23 +882,13 @@ export default function DashboardPage() {
                               <label className="lk-admin-label">Mensaje de WhatsApp a enviar</label>
                               <input type="text" value={sec.whatsappMessage} onChange={(e) => { const updated = [...(business.infoSections || [])]; updated[idx].whatsappMessage = e.target.value; setBusiness({ ...business, infoSections: updated }); }} className="lk-admin-input" />
                             </div>
-                          </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                            <div>
-                              <label className="lk-admin-label">Texto del Botón</label>
-                              <input type="text" value={sec.ctaText} onChange={(e) => { const updated = [...(business.infoSections || [])]; updated[idx].ctaText = e.target.value; setBusiness({ ...business, infoSections: updated }); }} className="lk-admin-input" />
-                            </div>
-                            <div>
-                              <label className="lk-admin-label">Mensaje de WhatsApp a enviar</label>
-                              <input type="text" value={sec.whatsappMessage} onChange={(e) => { const updated = [...(business.infoSections || [])]; updated[idx].whatsappMessage = e.target.value; setBusiness({ ...business, infoSections: updated }); }} className="lk-admin-input" />
-                            </div>
-                            {/* NUEVO CAMPO */}
                             <div className="sm:col-span-2">
                               <label className="lk-admin-label">Enlace personalizado (Opcional)</label>
                               <input type="url" placeholder="Ej. https://mitienda.com/membresia" value={sec.customLink || ""} onChange={(e) => { const updated = [...(business.infoSections || [])]; updated[idx].customLink = e.target.value; setBusiness({ ...business, infoSections: updated }); }} className="lk-admin-input" />
                               <p className="text-[10px] text-slate-400 mt-1">Si se llena este campo, el botón llevará a este enlace (con UTMs de rastreo) en lugar de WhatsApp.</p>
                             </div>
                           </div>
+
                           <div className="pt-2 flex justify-end">
                             <button type="button" onClick={() => setBusiness({ ...business, infoSections: (business.infoSections || []).filter((s) => s.id !== sec.id) })} className="text-xs font-bold text-red-500 hover:underline cursor-pointer">Eliminar tarjeta</button>
                           </div>

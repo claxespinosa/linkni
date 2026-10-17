@@ -143,7 +143,7 @@ export default function MenuServicesTemplate({
           )}
 
           {item.tag && (
-            <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm px-3 py-1 rounded-md shadow-xs">
+            <div className="c-tag absolute top-3 left-3 bg-white/95 backdrop-blur-sm px-3 py-1 rounded-md shadow-xs">
               <span className="text-[10px] font-black text-gray-800 uppercase tracking-wider">
                 {item.tag}
               </span>
@@ -152,9 +152,9 @@ export default function MenuServicesTemplate({
         </div>
 
         <div className="p-6 flex-1 flex flex-col">
-          <h3 className="text-xl font-bold text-gray-900 mb-2">{item.name}</h3>
+          <h3 className="c-title font-bold text-gray-900 mb-2">{item.name}</h3>
 
-          <p className="text-sm text-gray-500 mb-5 leading-relaxed">
+          <p className="c-description text-sm text-gray-500 mb-5 leading-relaxed leading-tight">
             {item.description}
           </p>
 
@@ -191,7 +191,7 @@ export default function MenuServicesTemplate({
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => onTrackEvent?.("product_click", item.name)}
-              className="tpl-btn-soft"
+              className="btn-contact tpl-btn-soft"
             >
               {isWhatsApp ? (
                 <svg className="w-4 h-4 tpl-icon-primary" fill="currentColor" viewBox="0 0 24 24">
