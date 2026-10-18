@@ -1,25 +1,31 @@
 import { Metadata } from "next";
 import { createClient } from "../../lib/supabase";
-import ClientPage from "./ClientPage"; // Importamos tu archivo renombrado
+import ClientPage from "./ClientPage";
 
+// Ajuste para soportar params asíncronos en las versiones nuevas de Next.js
 type Props = {
-  params: { slug: string };
+  params: Promise<{ slug: string }> | { slug: string };
 };
 
-// 1. Esta función es la que lee WhatsApp para armar la miniatura con el logo
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  // 1. Extraemos el slug correctamente esperando la promesa
+  const resolvedParams = await Promise.resolve(params);
+  const slug = resolvedParams.slug;
+
   const supabase = createClient();
 
+  // 2. Buscamos el negocio en Supabase
   const { data } = await supabase
     .from("businesses")
     .select("name, tagline, bio, logo_url")
-    .eq("slug", params.slug)
+    .eq("slug", slug)
     .maybeSingle();
 
+  // 3. Asignamos la información (ahora sí encontrará a The Sund Blend)
   const title = data?.name || "Linkni";
   const description = data?.tagline || data?.bio || "Visita nuestro perfil";
 
-  // WhatsApp exige que la URL del logo sea absoluta (que empiece con https://)
+  // 4. Preparamos el logo con URL absoluta para WhatsApp
   let imageUrl = data?.logo_url || "";
   if (imageUrl.startsWith("/")) {
     imageUrl = `https://linkni.adesarrolloweb.com${imageUrl}`;
@@ -31,12 +37,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title,
       description,
-      images: imageUrl ? [imageUrl] : [], // Aquí le entregamos el logo a WhatsApp
+      url: `https://linkni.adesarrolloweb.com/${slug}`,
+      siteName: "Linkni",
+      images: imageUrl
+        ? [
+            {
+              url: imageUrl,
+              width: 600, // WhatsApp pide ancho y alto explícito para cargar la previa más rápido
+              height: 600,
+              alt: title,
+            },
+          ]
+        : [],
     },
   };
 }
 
-// 2. Renderizamos tu componente original intacto
 export default function Page() {
   return <ClientPage />;
 }
