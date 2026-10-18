@@ -181,10 +181,8 @@ body {
   font-size: 21px;
   letter-spacing: 1px;
   margin-bottom: 0;
+  /*@apply  text-xl font-bold text-gray-900 mb-2;*/
 }
-/*.c-title {
-  @apply  text-xl font-bold text-gray-900 mb-2;
-}*/
 .c-description {
   @apply text-gray-700;
 }
