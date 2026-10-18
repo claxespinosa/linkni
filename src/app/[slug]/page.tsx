@@ -1,142 +1,42 @@
-"use client";
-
-import React, { useEffect, useState } from "react";
-import { notFound, useParams } from "next/navigation";
-import { BusinessProfile } from "../../data/businesses";
+import { Metadata } from "next";
 import { createClient } from "../../lib/supabase";
-import MenuServicesTemplate from "../../components/templates/MenuServicesTemplate";
-import BackToTop from "../../components/ui/BackToTop";
+import ClientPage from "./ClientPage"; // Importamos tu archivo renombrado
 
-export default function BusinessPage() {
-  const params = useParams();
-  const slug = (params?.slug as string) || "";
+type Props = {
+  params: { slug: string };
+};
+
+// 1. Esta función es la que lee WhatsApp para armar la miniatura con el logo
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const supabase = createClient();
 
-  const [business, setBusiness] = useState<BusinessProfile | null>(null);
-  const [businessId, setBusinessId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data } = await supabase
+    .from("businesses")
+    .select("name, tagline, bio, logo_url")
+    .eq("slug", params.slug)
+    .maybeSingle();
 
-  useEffect(() => {
-    // Si los params aún no han hidratado en el cliente, esperar
-    if (!slug) return;
+  const title = data?.name || "Linkni";
+  const description = data?.tagline || data?.bio || "Visita nuestro perfil";
 
-    let isMounted = true;
-
-    const fetchBusiness = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("businesses")
-          .select("*")
-          .eq("slug", slug)
-          .maybeSingle();
-
-        if (error) {
-          console.error("Error al consultar negocio en Supabase:", error);
-        }
-
-        if (data && isMounted) {
-          setBusinessId(data.id);
-          setBusiness({
-            slug: data.slug,
-            templateType: data.template_type,
-            name: data.name,
-            tagline: data.tagline || "",
-            bio: data.bio || "",
-            whatsapp: data.whatsapp || "",
-            instagram: data.instagram || "",
-            facebook: data.facebook || "",
-            logoUrl: data.logo_url || "",
-            socialConfig: data.social_config || {},
-            theme: data.theme || { primary: "#111827", secondary: "#4B5563", bgLight: "#F7F3F0" },
-            categories: data.categories || [],
-            products: data.products || [],
-            infoSections: data.info_sections || [],
-          });
-
-          // Registrar visita silenciosa
-          await supabase.from("analytics_events").insert({
-            business_id: data.id,
-            event_type: "page_view",
-          });
-        }
-      } catch (err) {
-        console.error("Fallo inesperado al conectar con Supabase:", err);
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchBusiness();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [slug]);
-
-  const trackEvent = async (
-    eventType: "whatsapp_click" | "product_click",
-    itemName?: string
-  ) => {
-    if (!businessId) return;
-    await supabase.from("analytics_events").insert({
-      business_id: businessId,
-      event_type: eventType,
-      item_name: itemName || null,
-    });
-  };
-
-  // Spinner neutro mientras resuelve la consulta en el cliente
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f8f9fa]">
-        <div className="w-7 h-7 border-3 border-slate-200 border-t-slate-800 rounded-full animate-spin" />
-      </div>
-    );
+  // WhatsApp exige que la URL del logo sea absoluta (que empiece con https://)
+  let imageUrl = data?.logo_url || "";
+  if (imageUrl.startsWith("/")) {
+    imageUrl = `https://linkni.adesarrolloweb.com${imageUrl}`;
   }
 
-  // Si terminó de cargar y no existe ese slug en la base de datos, dispara el 404
-  if (!business) {
-    notFound();
-  }
-
-  const renderTemplate = () => {
-    switch (business.templateType) {
-      case "menu-servicios":
-        return <MenuServicesTemplate business={business} onTrackEvent={trackEvent} />;
-      case "contacto-perfil":
-        return <MenuServicesTemplate business={business} onTrackEvent={trackEvent} />;
-      case "tienda-pedidos":
-        return <MenuServicesTemplate business={business} onTrackEvent={trackEvent} />;
-      case "agenda-citas":
-        return <MenuServicesTemplate business={business} onTrackEvent={trackEvent} />;
-      default:
-        return <MenuServicesTemplate business={business} onTrackEvent={trackEvent} />;
-    }
+  return {
+    title: `${title} | Linkni`,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: imageUrl ? [imageUrl] : [], // Aquí le entregamos el logo a WhatsApp
+    },
   };
+}
 
-  return (
-    <div
-      style={
-        {
-          "--client-primary": business.theme.primary,
-          "--client-secondary": business.theme.secondary || business.theme.primary,
-          "--client-bg-light": business.theme.bgLight || "#F7F3F0",
-        } as React.CSSProperties
-      }
-      className="relative min-h-screen flex flex-col bg-[#f8f9fa]"
-    >
-      <div className="flex-1">{renderTemplate()}</div>
-
-      <footer className="lk-powered-footer">
-        <a href="/" className="lk-powered-badge">
-          <span>Impulsado por</span>
-          <img  className="w-[40px] lk-powered-brand" src="https://mlwyhzquiamzgiywtycn.supabase.co/storage/v1/object/public/business-assets/img/linkni-logo.png"></img>© 2026
-        </a>
-      </footer>
-
-      <BackToTop color={business.theme.primary} />
-    </div>
-  );
+// 2. Renderizamos tu componente original intacto
+export default function Page() {
+  return <ClientPage />;
 }
