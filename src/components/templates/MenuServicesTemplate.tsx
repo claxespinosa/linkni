@@ -154,13 +154,13 @@ export default function MenuServicesTemplate({
         <div className="p-6 flex-1 flex flex-col">
           <h3 className="c-title font-bold text-gray-900 mb-2">{item.name}</h3>
 
-          <p className="c-description text-sm text-gray-500 mb-5 leading-relaxed leading-tight">
+          <p className="c-description text-sm mb-5 leading-relaxed">
             {item.description}
           </p>
 
           {item.keyAssets && item.keyAssets.length > 0 && (
             <div className="mb-5">
-              <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+              <h4 className="text-xs font-bold mb-1.5 tpl-accent-text mb-2">
                 Ingredientes / Características
               </h4>
               <div className="flex flex-wrap gap-1.5">

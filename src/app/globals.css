@@ -120,6 +120,8 @@ body {
 
 .tpl-accent-text {
   color: var(--client-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .tpl-icon-primary {
@@ -137,7 +139,8 @@ body {
 }
 
 .tpl-btn-soft {
-  @apply w-full flex items-center justify-center gap-2 bg-gray-50 hover:bg-gray-100 text-gray-800 font-semibold py-3 rounded-xl text-sm transition-colors border border-gray-200 cursor-pointer;
+  @apply w-full flex items-center justify-center gap-2 bg-gray-50 hover:bg-gray-100 font-semibold py-3 rounded-xl text-sm transition-colors border border-gray-200 cursor-pointer;
+  color: var(--client-primary);
 }
 
 /* Barra de Categorías / Tabs del Cliente */
@@ -150,7 +153,8 @@ body {
 }
 
 .tpl-tab {
-  @apply whitespace-nowrap px-4 py-2.5 rounded-xl text-sm font-bold transition-colors focus:outline-none cursor-pointer bg-transparent text-gray-500 hover:bg-gray-50;
+  @apply whitespace-nowrap px-4 py-2.5 text-sm font-bold transition-colors focus:outline-none cursor-pointer bg-transparent text-gray-500 hover:bg-gray-50;
+  border-radius: 20px;
 }
 
 .tpl-tab-active {
@@ -160,7 +164,9 @@ body {
 
 /* Tarjetas de Producto e Info del Cliente */
 .tpl-card {
-  @apply bg-white rounded-3xl shadow-xs border border-gray-100 overflow-hidden flex flex-col;
+  @apply bg-white border border-gray-100 overflow-hidden flex flex-col;
+  border-radius: 16px;
+  box-shadow: 2px 4px 12px #00000014;
 }
 
 .tpl-card-img-box {
@@ -172,11 +178,15 @@ body {
   @apply bg-white rounded-3xl shadow-xs border border-gray-100 p-8;
 }
 .c-title {
-  font-size: 35px;
+  font-size: 21px;
+  letter-spacing: 1px;
   margin-bottom: 0;
 }
+/*.c-title {
+  @apply  text-xl font-bold text-gray-900 mb-2;
+}*/
 .c-description {
-  font-size: 18px;
+  @apply text-gray-700;
 }
 .c-tag {
   border-radius: 20px;
