@@ -11,6 +11,7 @@ import {
   StoreConfig,
   DEFAULT_BUSINESS,
 } from "../../data/businesses";
+import { purgarCachePerfil } from "../actions";
 
 const DEFAULT_SOCIAL_CONFIG: SocialConfig = {
   showWhatsapp: true,
@@ -215,6 +216,7 @@ export default function DashboardPage() {
     if (error) {
       alert("Error al guardar: " + error.message);
     } else {
+      purgarCachePerfil(business.slug); // <-- LÍNEA AGREGADA AQUÍ
       alert("¡Cambios publicados en tu página!");
     }
   };

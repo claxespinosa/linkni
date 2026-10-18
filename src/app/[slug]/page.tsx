@@ -1,4 +1,3 @@
-export const revalidate = 0;
 import { Metadata } from "next";
 import { createClient } from "../../lib/supabase";
 import ClientPage from "./ClientPage";
