@@ -58,6 +58,11 @@ const generateUTMLink = (rawUrl: string | undefined, slug: string) => {
     return rawUrl;
   }
 };
+export interface MenuServicesTemplateProps {
+  business: BusinessProfile;
+  // Define la función de rastreo (ajusta los parámetros si en tu código envías más datos)
+  onTrackEvent: (eventType: string, itemName?: string) => void;
+}
 export default function MenuServicesTemplate({
   business,
   onTrackEvent,
