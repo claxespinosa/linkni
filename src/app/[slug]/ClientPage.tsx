@@ -5,6 +5,7 @@ import { notFound, useParams } from "next/navigation";
 import { BusinessProfile } from "../../data/businesses";
 import { createClient } from "../../lib/supabase";
 import MenuServicesTemplate from "../../components/templates/MenuServicesTemplate";
+import Image from "next/image";
 import BackToTop from "../../components/ui/BackToTop";
 
 export default function BusinessPage() {
@@ -51,6 +52,7 @@ export default function BusinessPage() {
             categories: data.categories || [],
             products: data.products || [],
             infoSections: data.info_sections || [],
+            customClubLabel: (data as any).custom_labels?.club_module || 'Club & Socios',
           });
 
           // Registrar visita silenciosa
@@ -129,10 +131,18 @@ export default function BusinessPage() {
     >
       <div className="flex-1">{renderTemplate()}</div>
 
-      <footer className="lk-powered-footer">
-        <a href="/" className="lk-powered-badge">
+    <footer className="lk-powered-footer mt-auto">
+        <a href="/" className="lk-powered-badge flex items-center justify-center gap-1.5">
           <span>Impulsado por</span>
-          <img  className="w-[40px] lk-powered-brand" src="https://mlwyhzquiamzgiywtycn.supabase.co/storage/v1/object/public/business-assets/img/linkni-logo.png"></img>© 2026
+          <Image 
+            //src="https://mlwyhzquiamzgiywtycn.supabase.co/storage/v1/object/public/business-assets/img/linkni-logo.png"
+            src="/api/media/img/linkni-logo.png"
+            alt="Logo Linkni"
+            width={40}
+            height={16} /* Ajusta el alto según la proporción real de tu logo */
+            className="lk-powered-brand object-contain"
+          />
+          <span>© {new Date().getFullYear()}</span>
         </a>
       </footer>
 

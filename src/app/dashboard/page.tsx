@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { createClient } from "../../lib/supabase";
 import {
   BusinessProfile,
@@ -106,6 +107,8 @@ export default function DashboardPage() {
       categories: bizData.categories || [],
       products: bizData.products || [],
       infoSections: bizData.info_sections || [],
+
+      customClubLabel: bizData.custom_labels?.club_module || "",
     });
 
     const { data: events } = await supabase
@@ -209,6 +212,9 @@ export default function DashboardPage() {
         categories: business.categories,
         products: business.products,
         info_sections: business.infoSections,
+        custom_labels: {
+          club_module: business.customClubLabel || 'Club & Socios'
+        }
       })
       .eq("id", businessId);
 
@@ -363,7 +369,15 @@ export default function DashboardPage() {
       <header className="lk-admin-topbar">
         <div className="max-w-xl mx-auto px-4 h-14 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
-            <span className="font-black text-base tracking-tight text-slate-900 shrink-0">Linkni</span>
+            {/* <span className="font-black text-base tracking-tight text-slate-900 shrink-0">Linkni</span> */}
+            <Image 
+              //src="https://mlwyhzquiamzgiywtycn.supabase.co/storage/v1/object/public/business-assets/img/linkni-logo.png"
+              src="/api/media/img/linkni-logo.png"
+              alt="Logo Linkni"
+              width={40}
+              height={16} /* Ajusta el alto según la proporción real de tu logo */
+              className="lk-powered-brand object-contain"
+            />
             {isMaster && allBusinesses.length > 0 ? (
               <select
                 value={businessId || ""}
@@ -576,6 +590,22 @@ export default function DashboardPage() {
                       </div>
                     </div>
                   )}
+                </div>
+
+                <div className="flex flex-col gap-1.5 mt-4">
+                  <label className="text-xs font-bold text-gray-700 uppercase">
+                    Etiqueta del Módulo Informativo
+                  </label>
+                  <input
+                    type="text"
+                    value={business.customClubLabel || ""}
+                    onChange={(e) => setBusiness({ ...business, customClubLabel: e.target.value })}
+                    placeholder="Ej. Membresías, Beneficios VIP, Promociones..."
+                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm w-full focus:ring-2 focus:ring-indigo-500 outline-none"
+                  />
+                  <p className="text-[10px] text-gray-500">
+                    Personaliza el nombre del botón que dirige a tus secciones adicionales.
+                  </p>
                 </div>
 
                 <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2.5">
@@ -939,6 +969,21 @@ export default function DashboardPage() {
           </div>
         )}
       </main>
+
+      <footer className="lk-powered-footer mt-auto">
+        <a href="/" className="lk-powered-badge flex items-center justify-center gap-1.5">
+          <span>Impulsado por</span>
+          <Image 
+            src="/api/media/img/linkni-logo.png"
+            //src="https://mlwyhzquiamzgiywtycn.supabase.co/storage/v1/object/public/business-assets/img/linkni-logo.png"z
+            alt="Logo Linkni"
+            width={40}
+            height={16} /* Ajusta el alto según la proporción real de tu logo */
+            className="lk-powered-brand object-contain"
+          />
+          <span>© {new Date().getFullYear()}</span>
+        </a>
+      </footer>
 
       {/* BOTÓN FLOTANTE GUARDAR */}
       {activeTab === "editor" && (

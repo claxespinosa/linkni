@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // 4. Preparamos el logo con URL absoluta para WhatsApp
   let imageUrl = data?.logo_url || "";
   if (imageUrl.startsWith("/")) {
-    imageUrl = `https://linkni.adesarrolloweb.com${imageUrl}`;
+    imageUrl = `https://linkni.mx${imageUrl}`;
   }
 
   return {
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title,
       description,
-      url: `https://linkni.adesarrolloweb.com/${slug}`,
+      url: `https://linkni.mx/${slug}`,
       siteName: "Linkni",
       images: imageUrl
         ? [

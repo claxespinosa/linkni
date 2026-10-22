@@ -1,15 +1,20 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   reactCompiler: true,
   turbopack: {
     rules: {
-      "*.css": {
-        loaders: ["@tailwindcss/turbopack"],
-        as: "*.css",
-      },
+      "*.css": { loaders: ["@tailwindcss/turbopack"], as: "*.css" },
     },
+  },
+  // Redirigimos nuestra ruta enmascarada al motor nativo
+  async rewrites() {
+    return [
+      {
+        source: '/linkni-opt',
+        destination: '/_next/image',
+      },
+    ];
   },
 };
 

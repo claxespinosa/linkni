@@ -1,13 +1,63 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { BusinessProfile, Product } from "../../data/businesses";
 
-interface MenuServicesTemplateProps {
-  business: BusinessProfile;
-  onTrackEvent?: (type: "whatsapp_click" | "product_click", itemName?: string) => void;
-}
+const linkniImageLoader = ({ src, width, quality }: { src: string; width: number; quality?: number }) => {
+  if (!src) return "";
 
+  // A. Si decides poner el logo de Linkni localmente en tu proyecto Next.js (recomendado para assets de la marca)
+  if (src.startsWith('/') && !src.startsWith('/api/')) {
+    return `/linkni-opt?url=${encodeURIComponent(src)}&w=${width}&q=${quality || 75}`;
+  }
+
+  // B. Si la URL ya viene con formato de nuestra API
+  if (src.startsWith('/api/media/')) {
+    return `/linkni-opt?url=${encodeURIComponent(src)}&w=${width}&q=${quality || 75}`;
+  }
+
+  // C. Extracción limpia de la Raíz de Supabase
+  try {
+    let storagePath = "";
+
+    // Extraemos todo lo que está después de "public/" o "authenticated/" (obtiene Bucket + Carpetas + Archivo)
+    if (src.includes('/object/public/')) {
+      storagePath = src.split('/object/public/')[1]; 
+    } else if (src.includes('/object/authenticated/')) {
+      storagePath = src.split('/object/authenticated/')[1];
+    } else {
+      // Por si en la base de datos se guardó la ruta relativa (ej: "/business-assets/...")
+      const urlWithoutParams = src.split('?')[0];
+      storagePath = urlWithoutParams.replace(/^https?:\/\/[^\/]+\//, '');
+      storagePath = storagePath.replace(/^\//, ''); // Quitar barra inicial
+    }
+
+    if (!storagePath.match(/\.(png|jpe?g|webp|gif)$/i)) {
+      storagePath += '.png';
+    }
+
+    const finalPath = `/api/media/${storagePath}`;
+    return `/linkni-opt?url=${encodeURIComponent(finalPath)}&w=${width}&q=${quality || 75}`;
+  } catch (e) {
+    return src;
+  }
+};
+
+const generateUTMLink = (rawUrl: string | undefined, slug: string) => {
+  if (!rawUrl) return "";
+  try {
+    const url = new URL(rawUrl);
+    if (!url.searchParams.has("utm_source")) {
+      url.searchParams.set("utm_source", "linkni");
+      url.searchParams.set("utm_medium", "catalogo");
+      url.searchParams.set("utm_campaign", slug);
+    }
+    return url.toString();
+  } catch {
+    return rawUrl;
+  }
+};
 export default function MenuServicesTemplate({
   business,
   onTrackEvent,
@@ -121,10 +171,14 @@ export default function MenuServicesTemplate({
       <article key={item.id} className="tpl-card">
         <div className="tpl-card-img-box">
           {item.imgUrl ? (
-            <img
+            <Image
+              loader={linkniImageLoader}
+              //src={getCleanImageUrl(item.imgUrl, business.slug)}
               src={item.imgUrl}
               alt={item.name}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 400px"
             />
           ) : (
             <svg
@@ -215,10 +269,14 @@ export default function MenuServicesTemplate({
       {/* HEADER DEL CLIENTE */}
       <header className="tpl-header">
         {business.logoUrl ? (
-          <img
+          <Image
+            loader={linkniImageLoader}
             src={business.logoUrl}
+            //src={getCleanImageUrl(business.logoUrl, business.slug)}
             alt={`Logo de ${business.name}`}
-            className="tpl-logo"
+            width={120}
+            height={120}
+            className="tpl-logo object-cover"
           />
         ) : (
           <div className="tpl-avatar">
@@ -250,7 +308,7 @@ export default function MenuServicesTemplate({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => onTrackEvent?.("whatsapp_click", "WhatsApp Principal")}
-                className="tpl-btn-primary flex-1 min-w-[140px]"
+                className="btn-wa tpl-btn-primary flex-1 min-w-[140px]"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
@@ -261,10 +319,11 @@ export default function MenuServicesTemplate({
 
             {sc.showInstagram && business.instagram && (
               <a
-                href={`https://instagram.com/${business.instagram.replace(/^@/, "")}`}
+                //href={`https://instagram.com/${business.instagram.replace(/^@/, "")}`}
+                href={generateUTMLink(business.instagram, business.slug)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="tpl-btn-outline"
+                className="btn-ig tpl-btn-outline"
               >
                 Instagram
               </a>
@@ -272,10 +331,11 @@ export default function MenuServicesTemplate({
 
             {sc.showFacebook && business.facebook && (
               <a
-                href={`https://facebook.com/${business.facebook.replace(/^@/, "")}`}
+                //href={`https://facebook.com/${business.facebook.replace(/^@/, "")}`}
+                href={generateUTMLink(business.facebook, business.slug)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="tpl-btn-outline"
+                className="btn-fb tpl-btn-outline"
               >
                 Facebook
               </a>
@@ -283,10 +343,11 @@ export default function MenuServicesTemplate({
 
             {sc.showTiktok && sc.tiktok && (
               <a
-                href={`https://tiktok.com/@${sc.tiktok.replace(/^@/, "")}`}
+                //href={`https://tiktok.com/@${sc.tiktok.replace(/^@/, "")}`}
+                href={generateUTMLink(sc.tiktok, business.slug)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="tpl-btn-outline"
+                className="btn-tk tpl-btn-outline"
               >
                 TikTok
               </a>
@@ -296,10 +357,10 @@ export default function MenuServicesTemplate({
           {/* Botón de Enlace Personalizado (Nombre + URL) */}
           {sc.showCustomLink && sc.customLinkLabel && sc.customLinkUrl && (
             <a
-              href={sc.customLinkUrl}
+              href={generateUTMLink(sc.customLinkUrl, business.slug)}
               target="_blank"
               rel="noopener noreferrer"
-              className="tpl-btn-outline w-full py-2.5 text-xs font-semibold"
+              className="btn-custom tpl-btn-outline w-full py-2.5 text-xs font-semibold"
             >
               🔗 {sc.customLinkLabel}
             </a>
@@ -311,7 +372,7 @@ export default function MenuServicesTemplate({
               href={sc.googleReviewsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="tpl-btn-outline w-full py-2.5 text-xs font-bold flex items-center justify-center gap-1.5"
+              className="btn-reviews tpl-btn-outline w-full py-2.5 text-xs font-bold flex items-center justify-center gap-1.5"
             >
               <span className="text-amber-500">★★★★★</span>
               <span>{sc.googleRating || "5.0"} en Google · Ver reseñas</span>
@@ -322,9 +383,9 @@ export default function MenuServicesTemplate({
             <button
               type="button"
               onClick={() => scrollToSection("secciones-informativas")}
-              className="tpl-btn-soft py-2.5 text-xs"
+              className="btn-info tpl-btn-soft py-2.5 text-xs"
             >
-              Club & Socios
+              {business.customClubLabel || "Club & Socios"}
             </button>
           )}
         </div>

@@ -62,7 +62,8 @@ export interface BusinessProfile {
   facebook?: string;
   logoUrl?: string;
   socialConfig?: SocialConfig;
-  storeConfig?: StoreConfig; // NUEVO
+  storeConfig?: StoreConfig;
+  customClubLabel?: string;
   theme: {
     primary: string;
     secondary: string;
