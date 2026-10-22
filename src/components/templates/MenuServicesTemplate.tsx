@@ -60,8 +60,8 @@ const generateUTMLink = (rawUrl: string | undefined, slug: string) => {
 };
 export interface MenuServicesTemplateProps {
   business: BusinessProfile;
-  // Define la función de rastreo (ajusta los parámetros si en tu código envías más datos)
-  onTrackEvent: (eventType: string, itemName?: string) => void;
+  // Ajustado para coincidir exactamente con ClientPage.tsx
+  onTrackEvent: (eventType: "whatsapp_click" | "product_click", itemName?: string) => void | Promise<void>;
 }
 export default function MenuServicesTemplate({
   business,
