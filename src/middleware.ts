@@ -14,7 +14,7 @@ export function middleware(request: NextRequest) {
     if (
       !referer || 
       fetchDest === 'document' || 
-      (!referer.includes('localhost') && !referer.includes('linkni.mx'))
+      (!referer.includes('localhost') && !referer.includes('linkni.mx') && !referer.includes('adesarrolloweb.com'))
     ) {
       return new NextResponse('Acceso denegado. Este activo está protegido por Linkni.', { status: 403 });
     }

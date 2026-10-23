@@ -11,7 +11,7 @@ export async function GET(
 
     // 1. Capa de Defensa Anti-Hotlinking
     const referer = request.headers.get('referer');
-    if (referer && !referer.includes('localhost') && !referer.includes('linkni.mx') && !referer.includes('vercel.app')) {
+    if (referer && !referer.includes('localhost') && !referer.includes('linkni.mx') && !referer.includes('vercel.app') && !referer.includes('adesarrolloweb.com')) {
       return new NextResponse('Hotlinking denegado por seguridad', { status: 403 });
     }
 
