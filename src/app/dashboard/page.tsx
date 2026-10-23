@@ -36,6 +36,14 @@ const DEFAULT_STORE_CONFIG: StoreConfig = {
   minOrder: 0,
 };
 
+const getSecurePreviewUrl = (url: string | undefined) => {
+  if (!url) return "";
+  if (url.includes("supabase.co") && url.includes("/public/")) {
+    return `/api/media/${url.split("/public/")[1]}`;
+  }
+  return url;
+};
+
 export default function DashboardPage() {
   const supabase = createClient();
   const router = useRouter();
@@ -472,7 +480,11 @@ export default function DashboardPage() {
               
               <div className="flex items-center gap-4">
                 {business.logoUrl ? (
-                  <img src={business.logoUrl} alt="Logo" className="w-16 h-16 rounded-full object-contain border border-slate-200 p-1 bg-white shrink-0" />
+                  <img 
+                  //src={business.logoUrl} 
+                  src={getSecurePreviewUrl(business.logoUrl)}
+                  alt="Logo" 
+                  className="w-16 h-16 rounded-full object-contain border border-slate-200 p-1 bg-white shrink-0" />
                 ) : (
                   <div style={{ backgroundColor: business.theme.primary }} className="w-16 h-16 rounded-full flex items-center justify-center text-white font-black text-lg shrink-0">
                     {business.name.slice(0, 2).toUpperCase()}
